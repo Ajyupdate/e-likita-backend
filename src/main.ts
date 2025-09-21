@@ -22,6 +22,19 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document);
 
-  await app.listen(process.env.PORT ?? 3000);
+  // Get port from environment (Render sets this automatically)
+  const port = process.env.PORT ?? 3000;
+  
+  // CRITICAL FIX: Bind to 0.0.0.0 instead of localhost
+  // This allows external connections from Render's load balancer
+  await app.listen(port, '0.0.0.0');
+  
+  console.log(`🚀 e-Likita API is running on port ${port}`);
+  console.log(`📚 API Documentation available at: http://localhost:${port}/docs`);
+  console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
 }
-bootstrap();
+
+bootstrap().catch(err => {
+  console.error('❌ Error starting the application:', err);
+  process.exit(1);
+});
